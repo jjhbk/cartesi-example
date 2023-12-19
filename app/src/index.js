@@ -8,10 +8,16 @@ var viem = require("viem");
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL;
 console.log("HTTP rollup_server url is " + rollup_server);
 let compressedData = new Map();
-var erc20abi = require("./erc20.json");
+var erc20abi = require("./contract");
+var erc721abi = require("./erc721.json");
 const erc20_contract_address = viem.getAddress(
-  "0xd9145CCE52D386f254917e481eB44e9943F39138"
+  "0x2797a6a6D9D94633BA700b52Ad99337DdaFA3f52"
 );
+const erc721_contract_address = viem.getAddress(
+  "0x68E3Ee84Bcb7543268D361Bb92D3bBB17e90b838"
+);
+const DAPP_ADDRESS_REALY = "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE";
+let DAPP_ADDRESS = "null";
 const toBinString = (bytes) =>
   bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, "0"), "");
 
@@ -41,6 +47,14 @@ async function handle_advance(data) {
   const payload = data.payload;
   let JSONpayload = {};
   try {
+    if (
+      String(data.metadata.msg_sender).toLowerCase() ===
+      DAPP_ADDRESS_REALY.toLowerCase()
+    ) {
+      console.log("setting Dapp address:", payload);
+      DAPP_ADDRESS = payload;
+    }
+
     const payloadStr = viem.hexToString(payload);
     JSONpayload = JSON.parse(payloadStr);
     console.log(`received request ${JSON.stringify(JSONpayload)}`);
@@ -127,11 +141,16 @@ async function handle_advance(data) {
 
       //{"method":"prime","lower":"150000","higher":"445645646546556"}
     } else if (JSONpayload.method === "faucet") {
-      console.log("abi is", erc20abi);
+      console.log("sending erc20 tokens.....");
+      if (DAPP_ADDRESS === "null") {
+        console.log("Dapp address is not set");
+        return "reject";
+      }
+      // console.log("abi is", erc20abi);
       const call = viem.encodeFunctionData({
         abi: erc20abi,
         functionName: "transfer",
-        args: [JSONpayload.value],
+        args: [data.metadata.msg_sender, BigInt(JSONpayload.value)],
       });
       let voucher = {
         destination: erc20_contract_address, // dapp Address
@@ -146,10 +165,34 @@ async function handle_advance(data) {
         body: JSON.stringify(voucher),
       });
       console.log("starting a voucher");
+      //{"method":"faucet","value":"150000"}
+    } else if (JSONpayload.method === "mint") {
+      console.log("minting erc721 token.....");
+
+      // console.log("abi is", erc20abi);
+      const call = viem.encodeFunctionData({
+        abi: erc721abi,
+        functionName: "mintTo",
+        args: [data.metadata.msg_sender],
+      });
+      let voucher = {
+        destination: erc721_contract_address, // dapp Address
+        payload: call,
+      };
+      console.log(voucher);
+      advance_req = await fetch(rollup_server + "/voucher", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(voucher),
+      });
+      console.log("starting a voucher");
+      //{"method":"mint"}
     } else {
       console.log("method undefined");
       const result = JSON.stringify({
-        error: String("method undefined:" + JSONpayload.methos),
+        error: String("method undefined:" + JSONpayload.method),
       });
       const hexresult = viem.stringToHex(result);
       await fetch(rollup_server + "/report", {
