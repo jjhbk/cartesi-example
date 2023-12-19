@@ -231,6 +231,44 @@ async function handle_advance(data) {
 
 async function handle_inspect(data) {
   console.log("Received inspect request data " + JSON.stringify(data));
+  const payload = data.payload;
+  let inspect_req;
+  try {
+    const payloadStr = viem.hexToString(data.payload);
+    console.log("received inspect request with payload", payloadStr);
+    const payloadArr = payloadStr.split("/");
+    console.log(payloadArr);
+
+    const result = JSON.stringify({
+      value: toBinString(compressedData.get(payloadArr[1])),
+    });
+    const hexresult = viem.stringToHex(result);
+    if (payloadArr[0] === "storage") {
+      console.log(
+        "fetching the stored value result",
+        compressedData.get(payloadArr[1])
+      );
+      inspect_req = await fetch(rollup_server + "/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ payload: hexresult }),
+      });
+      console.log("Adding report with" + inspect_req.status);
+      return "accept";
+    }
+  } catch (e) {
+    console.log(`Adding report with binary value "${payload}",${e}`);
+  }
+  inspect_req = await fetch(rollup_server + "/report", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ payload }),
+  });
+  console.log("Adding report with" + inspect_req.status);
   return "accept";
 }
 
