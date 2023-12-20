@@ -1,13 +1,14 @@
 // XXX even though ethers is not used in the code below, it's very likely
 // it will be used by any DApp, so we are already including it here
-const { ethers, uuidV4, keccak256, toUtf8Bytes } = require("ethers");
-var compressjs = require("compressjs");
-var algorithm = compressjs.Huffman;
+//@ts-nocheck
+const { ethers, keccak256, toUtf8Bytes } = require("ethers");
+
+const { gzip, ungzip } = require("node-gzip");
 var { v4: uuidv4 } = require("uuid");
 var viem = require("viem");
 const rollup_server = process.env.ROLLUP_HTTP_SERVER_URL;
 console.log("HTTP rollup_server url is " + rollup_server);
-let compressedData = new Map();
+
 var erc20abi = require("./contract");
 var erc721abi = require("./erc721.json");
 const erc20_contract_address = viem.getAddress(
@@ -18,6 +19,7 @@ const erc721_contract_address = viem.getAddress(
 );
 const DAPP_ADDRESS_REALY = "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE";
 let DAPP_ADDRESS = "null";
+let compressedData = new Map();
 const toBinString = (bytes) =>
   bytes.reduce((str, byte) => str + byte.toString(2).padStart(8, "0"), "");
 
@@ -74,8 +76,7 @@ async function handle_advance(data) {
     if (JSONpayload.method === "compress") {
       console.log("compressing....");
       let id = uuidv4();
-      var databuf = new Buffer(JSONpayload.data, "utf-8");
-      var compressed = algorithm.compressFile(databuf);
+      var compressed = await gzip(JSONpayload.data);
       compressedData.set(id, compressed);
       console.log("Compressed data is", id, compressed);
 
@@ -94,8 +95,8 @@ async function handle_advance(data) {
     } else if (JSONpayload.method === "decompress") {
       console.log("decompressing....");
       const dataArr = compressedData.get(JSONpayload.id);
-      var datbuf = algorithm.decompressFile(dataArr);
-      var originalDat = new Buffer(datbuf).toString("utf-8");
+      var datbuf = await ungzip(dataArr);
+      var originalDat = datbuf.toString();
       console.log("the original data is:", originalDat);
       const result = JSON.stringify({ originaldata: originalDat });
       const hexresult = viem.stringToHex(result);
@@ -107,7 +108,7 @@ async function handle_advance(data) {
         body: JSON.stringify({ payload: hexresult }),
       });
 
-      //{"method":"decompress","id":"5447416f-98ab-4c3f-944b-f66ea3d3c261"}
+      //{"method":"decompress","id":"000c7899-96bb-498b-8820-691d5e04ba33"}
     } else if (JSONpayload.method === "hash") {
       console.log("hashing....");
       const hash = keccak256(toUtf8Bytes(JSONpayload.data));
@@ -139,7 +140,7 @@ async function handle_advance(data) {
         body: JSON.stringify({ payload: hexresult }),
       });
 
-      //{"method":"prime","lower":"150000","higher":"445645646546556"}
+      //{"method":"prime","lower":"1500","higher":"1600"}
     } else if (JSONpayload.method === "faucet") {
       console.log("sending erc20 tokens.....");
       if (DAPP_ADDRESS === "null") {

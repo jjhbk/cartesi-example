@@ -186,26 +186,6 @@ aes-js@4.0.0-beta.5:
   resolved "https://registry.npmjs.org/aes-js/-/aes-js-4.0.0-beta.5.tgz"
   integrity sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==
 
-amdefine@~1.0.0:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/amdefine/-/amdefine-1.0.1.tgz"
-  integrity sha512-S2Hw0TtNkMJhIabBwIojKL9YHO5T0n5eNqWJ7Lrlel/zDbftQpxpapi8tZs3X1HWa+u+QeydGmzzNU0m09+Rcg==
-
-commander@~2.8.1:
-  version "2.8.1"
-  resolved "https://registry.npmjs.org/commander/-/commander-2.8.1.tgz"
-  integrity sha512-+pJLBFVk+9ZZdlAOB5WuIElVPPth47hILFkmGym57aq8kwxsowvByvB0DHs1vQAhyMZzdcpTtF0VDKGkSDR4ZQ==
-  dependencies:
-    graceful-readlink ">= 1.0.0"
-
-compressjs@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.npmjs.org/compressjs/-/compressjs-1.0.3.tgz"
-  integrity sha512-jpKJjBTretQACTGLNuvnozP1JdP2ZLrjdGdBgk/tz1VfXlUcBhhSZW6vEsuThmeot/yjvSrPQKEgfF3X2Lpi8Q==
-  dependencies:
-    amdefine "~1.0.0"
-    commander "~2.8.1"
-
 esbuild@^0.19.2:
   version "0.19.2"
   resolved "https://registry.npmjs.org/esbuild/-/esbuild-0.19.2.tgz"
@@ -247,11 +227,6 @@ ethers@^6.7.1:
     tslib "2.4.0"
     ws "8.5.0"
 
-"graceful-readlink@>= 1.0.0":
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/graceful-readlink/-/graceful-readlink-1.0.1.tgz"
-  integrity sha512-8tLu60LgxF6XpdbK8OW3FA+IfTNBn1ZHGHKF4KQbEeSkajYw5PlYJcKluntgegDPTg8UkHjpet1T82vk6TQ68w==
-
 isows@1.0.3:
   version "1.0.3"
   resolved "https://registry.npmjs.org/isows/-/isows-1.0.3.tgz"
@@ -262,15 +237,15 @@ nan@^2.18.0:
   resolved "https://registry.npmjs.org/nan/-/nan-2.18.0.tgz"
   integrity sha512-W7tfG7vMOGtD30sHoZSSc/JVYiyDPEyQVso/Zz+/uQd0B0L46gtC+pHha5FFMRpil6fm/AoEcRWyOVi4+E/f8w==
 
+node-gzip@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/node-gzip/-/node-gzip-1.1.2.tgz#245bd171b31ce7c7f50fc4cd0ca7195534359afb"
+  integrity sha512-ZB6zWpfZHGtxZnPMrJSKHVPrRjURoUzaDbLFj3VO70mpLTW5np96vXyHwft4Id0o+PYIzgDkBUjIzaNHhQ8srw==
+
 tslib@2.4.0:
   version "2.4.0"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.4.0.tgz"
   integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
-
-uint8-to-base64@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.npmjs.org/uint8-to-base64/-/uint8-to-base64-0.2.0.tgz"
-  integrity sha512-r13jrghEYZAN99GeYpEjM107DOxqB65enskpwce8rRHVAGEtaWmsF5GqoGdPMf8DIXc9XyAJTdvlvRZi4LsszA==
 
 uuid@^9.0.1:
   version "9.0.1"
