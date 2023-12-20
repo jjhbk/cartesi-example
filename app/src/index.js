@@ -91,7 +91,7 @@ async function handle_advance(data) {
         body: JSON.stringify({ payload: hexresult }),
       });
 
-      //{"method":"compress","data":"My name is jathin jagannath goud"}
+      //{"method":"compress","data":"This is a Cartesi workshop with BIH"}
     } else if (JSONpayload.method === "decompress") {
       console.log("decompressing....");
       const dataArr = compressedData.get(JSONpayload.id);
@@ -141,6 +141,29 @@ async function handle_advance(data) {
       });
 
       //{"method":"prime","lower":"1500","higher":"1600"}
+    } else if (JSONpayload.method === "mint") {
+      console.log("minting erc721 token.....");
+
+      // console.log("abi is", erc20abi);
+      const call = viem.encodeFunctionData({
+        abi: erc721abi,
+        functionName: "mintTo",
+        args: [data.metadata.msg_sender],
+      });
+      let voucher = {
+        destination: erc721_contract_address, // dapp Address
+        payload: call,
+      };
+      console.log(voucher);
+      advance_req = await fetch(rollup_server + "/voucher", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(voucher),
+      });
+      console.log("starting a voucher");
+      //{"method":"mint"}
     } else if (JSONpayload.method === "faucet") {
       console.log("sending erc20 tokens.....");
       if (DAPP_ADDRESS === "null") {
@@ -167,29 +190,6 @@ async function handle_advance(data) {
       });
       console.log("starting a voucher");
       //{"method":"faucet","value":"150000"}
-    } else if (JSONpayload.method === "mint") {
-      console.log("minting erc721 token.....");
-
-      // console.log("abi is", erc20abi);
-      const call = viem.encodeFunctionData({
-        abi: erc721abi,
-        functionName: "mintTo",
-        args: [data.metadata.msg_sender],
-      });
-      let voucher = {
-        destination: erc721_contract_address, // dapp Address
-        payload: call,
-      };
-      console.log(voucher);
-      advance_req = await fetch(rollup_server + "/voucher", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(voucher),
-      });
-      console.log("starting a voucher");
-      //{"method":"mint"}
     } else {
       console.log("method undefined");
       const result = JSON.stringify({
